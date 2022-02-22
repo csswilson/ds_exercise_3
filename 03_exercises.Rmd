@@ -184,7 +184,7 @@ It's natural to expect that bikes are rented more at some times of day, some day
 Trips %>% 
   ggplot(aes(x = sdate)) +
   geom_density(fill = "maroon4") +
-  labs(title = "Number of Bike Rental Events per Date", x = "", y ="") +
+  labs(title = "Density of Bike Rental Events Over Time", x = "", y ="") +
   theme(axis.text.y = element_blank())
 ```
   
@@ -211,7 +211,7 @@ Trips %>%
   mutate(DoW = wday(sdate, label = TRUE, abbr = TRUE)) %>% 
   ggplot(aes(y = DoW)) +
   geom_bar(fill = "maroon2", col = "maroon") +
-  labs(title = "Number of Bike Rental Events per Weekday", x = "", y ="")
+  labs(title = "Number of Bike Rental Events per Day of Week", x = "", y ="")
 ```
   
 Interpret: We see here that the largest number of rental events occur during the weekdays. This suggests to me that most people use the bike rental service to commute to their jobs. The rentals are also used on the weekends though for errands and fun things!
@@ -225,10 +225,14 @@ Trips %>%
          DoW = wday(sdate, label = TRUE, abbr = TRUE)) %>% 
   ggplot(aes(x = time_dec)) +
   geom_density(fill = "pink") +
-  labs(title = "Number of Bike Rental Events per Time of Day", x = "", y ="") +
-  facet_wrap(~ DoW)
+  labs(title = "Density of Bike Rental Events per Time of Day", x = "", y ="") +
+  facet_wrap(~ DoW) +
+  theme(axis.text.y = element_blank())
 ```
-  
+
+Interpret: From these graphs, we see a similar trend in rental frequency between the last few graphs. On weekdays, there is a consistent trend in peak rentals in the mornings and evenings when people are commuting to and from work, in addition to a slight bump over lunch time when people get food. On weekends, there a general peak slope through the entire day as people are out and about doing fun things at all times of the day. We also see smaller bumps around 1 am over the weekends when people are out late more often.
+
+
 The variable `client` describes whether the renter is a regular user (level `Registered`) or has not joined the bike-rental organization (`Causal`). The next set of exercises investigate whether these two different categories of users show different rental behavior and how `client` interacts with the patterns you found in the previous exercises. 
 
   11. Change the graph from exercise 10 to set the `fill` aesthetic for `geom_density()` to the `client` variable. You should also set `alpha = .5` for transparency and `color=NA` to suppress the outline of the density function.
@@ -239,9 +243,13 @@ Trips %>%
          DoW = wday(sdate, label = TRUE, abbr = TRUE)) %>% 
   ggplot(aes(x = time_dec)) +
   geom_density(aes(fill = client), color = NA, alpha = 0.5) +
-  labs(title = "Number of Bike Rental Events per Time of Day", x = "", y ="") +
-  facet_wrap(~ DoW)
+  labs(title = "Density of Bike Rental Events per Time of Day by Day of Week", x = "", y ="", fill = "Client") +
+  facet_wrap(~ DoW) +
+  theme(axis.text.y = element_blank())
 ```
+
+Interpret: 
+
 
   12. Change the previous graph by adding the argument `position = position_stack()` to `geom_density()`. In your opinion, is this better or worse in terms of telling a story? What are the advantages/disadvantages of each?
   
