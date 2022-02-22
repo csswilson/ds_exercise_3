@@ -119,11 +119,11 @@ garden_harvest %>%
   summarise(total_g = sum(weight),
             first_day = min(date)) %>% 
   mutate( total_lbs = total_g * 0.00220462) %>% 
-  ggplot(aes(y = fct_rev(fct_reorder(variety, first_day)), x = total_lbs)) +
+  ggplot(aes(y = fct_rev(fct_reorder(str_to_title(variety), first_day)), x = total_lbs)) +
   geom_bar(stat='identity') +
   labs(title = "Tomato Variety Total Pounds by First Harvest Date", x = "Lbs", y = "") +
   geom_col(fill = "pink") +
-  geom_text(aes(label = first_day, hjust = 1, nudge_x = -.5))
+  geom_text(aes(label = first_day, hjust = 1.25, nudge_x = -.5), size = 3)
 ```
 
   5. In the `garden_harvest` data, create two new variables: one that makes the varieties lowercase and another that finds the length of the variety name. Arrange the data by vegetable and length of variety name (smallest to largest), with one row for each vegetable variety. HINT: use `str_to_lower()`, `str_length()`, and `distinct()`.
@@ -167,7 +167,7 @@ Here is the code to read in the data. We do this a little differently than usual
 
 ```{r cache=TRUE}
 data_site <- 
-  "https://www.macalester.edu/~dshuman1/data/112/2014-Q4-Trips-History-Data-Small.rds" 
+  "https://www.macalester.edu/~dshuman1/data/112/2014-Q4-Trips-History-Data.rds" 
 Trips <- readRDS(gzcon(url(data_site)))
 Stations<-read_csv("http://www.macalester.edu/~dshuman1/data/112/DC-Stations.csv")
 ```
@@ -184,10 +184,13 @@ It's natural to expect that bikes are rented more at some times of day, some day
 Trips %>% 
   ggplot(aes(x = sdate)) +
   geom_density(fill = "maroon4") +
-  labs(title = "Number of Bike Rental Events per Date", x = "", y ="")
- # theme(axis.text.y = )
+  labs(title = "Number of Bike Rental Events per Date", x = "", y ="") +
+  theme(axis.text.y = element_blank())
 ```
   
+Interpret: Between October and January, we see the frequency of bike rentals decrease. This makes sense because the weather gets colder and colder so we would expect to see less people renting bikes in the winter. 
+
+
   8. A density plot of the events versus time of day.  You can use `mutate()` with `lubridate`'s  `hour()` and `minute()` functions to extract the hour of the day and minute within the hour from `sdate`. Hint: A minute is 1/60 of an hour, so create a variable where 3:30 is 3.5 and 3:45 is 3.75.
   
 ```{r}
@@ -195,8 +198,11 @@ Trips %>%
   mutate(time_dec = hour(sdate) + minute(sdate) / 60) %>% 
   ggplot(aes(x = time_dec)) +
   geom_density(fill = "maroon3") +
-  labs(title = "Number of Bike Rental Events per Time of Day", x = "", y ="")
+  labs(title = "Number of Bike Rental Events per Time of Day", x = "", y ="") +
+  theme(axis.text.y = element_blank())
 ```
+  
+Interpret: Across the hours of the day, we see the frequency of bike rentals increase in the morning as people wake up and start going to work. There is a peak in use at around 9 am when that is rush our of going to work. There is a dip after than as people settle into their days. There is another increase in frequency around lunch time as people rent bikes to go get lunch, and finally a last peak around 5/6 pm when people go home from work! There is a little increase around 1 am and this could be because of people riding home from a night out. 
   
   9. A bar graph of the events versus day of the week. Put day on the y-axis.
   
@@ -208,6 +214,9 @@ Trips %>%
   labs(title = "Number of Bike Rental Events per Weekday", x = "", y ="")
 ```
   
+Interpret: We see here that the largest number of rental events occur during the weekdays. This suggests to me that most people use the bike rental service to commute to their jobs. The rentals are also used on the weekends though for errands and fun things!
+
+
   10. Facet your graph from exercise 8. by day of the week. Is there a pattern?
   
 ```{r}
