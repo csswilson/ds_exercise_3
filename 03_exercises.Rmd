@@ -209,7 +209,7 @@ Interpret: Across the hours of the day, we see the frequency of bike rentals inc
 ```{r}
 Trips %>% 
   mutate(DoW = wday(sdate, label = TRUE, abbr = TRUE)) %>% 
-  ggplot(aes(y = DoW)) +
+  ggplot(aes(y = fct_rev(DoW))) +
   geom_bar(fill = "maroon2", col = "maroon") +
   labs(title = "Number of Bike Rental Events per Day of Week", x = "", y ="")
 ```
@@ -248,8 +248,7 @@ Trips %>%
   theme(axis.text.y = element_blank())
 ```
 
-Interpret: 
-
+Interpret: By specifying the type of client, we learn more about how different riders use the bike service. It appears that the Registered clients are the one that rent bikes during the week to commute to work as their peaks are at 9 and 5 ish. The casual rider distribution actually doesn't appear to vary much across the days of the week. The rentals are a slow increase over the afternoons of all days. 
 
   12. Change the previous graph by adding the argument `position = position_stack()` to `geom_density()`. In your opinion, is this better or worse in terms of telling a story? What are the advantages/disadvantages of each?
   
@@ -259,10 +258,13 @@ Trips %>%
          DoW = wday(sdate, label = TRUE, abbr = TRUE)) %>% 
   ggplot(aes(x = time_dec)) +
   geom_density(aes(fill = client), color = NA, alpha = 0.5, position = position_stack()) +
-  labs(title = "Number of Bike Rental Events per Time of Day", x = "", y ="") +
-  facet_wrap(~ DoW)
+  labs(title = "Density of Bike Rental Events per Time of Day and Day of Week", x = "", y ="", fill = "Client") +
+  facet_wrap(~ DoW) +
+  theme(axis.text.y = element_blank())
 ```
   
+Interpret: This is worse for storytelling because the stack function adds the Casual distribution to be shown on top of the Registered distribution rather than starting the values at zero again. This prevents us from seeing the true trend over time of the Causal riders because we see residual trends left over from the registered clients. This stack could be good for see the cumulative trend for all clients as the last layer. The Casual rider outline shows the same trend when we don't facet at all for client. So what we actually see is the amount the total trend that the Registered riders make up.  
+
   13. In this graph, go back to using the regular density plot (without `position = position_stack()`). Add a new variable to the dataset called `weekend` which will be "weekend" if the day is Saturday or Sunday and  "weekday" otherwise (HINT: use the `ifelse()` function and the `wday()` function from `lubridate`). Then, update the graph from the previous problem by faceting on the new `weekend` variable. 
   
 ```{r}
@@ -272,10 +274,14 @@ Trips %>%
          weekend = ifelse(DoW == c("Sat", "Sun"), 'weekend', 'weekday')) %>% 
   ggplot(aes(x = time_dec)) +
   geom_density(aes(fill = client), color = NA, alpha = 0.5) +
-  labs(title = "Number of Bike Rental Events per Time of Day", x = "", y ="") +
-  facet_wrap(~ weekend)
+  labs(title = "Density of Bike Rental Events per Time of Day", x = "", y ="", fill = "Client") +
+  facet_wrap(~ weekend) +
+  theme(axis.text.y = element_blank())
 ```
   
+Interpret:  Looking at weekdays, we see that casual riders rent bikes more in the afternoons while the Registered riders rent bikes more round 8 am and 7 pm at higher intensities. On the weekend both Casual and Registered riders rent bikes most in the afternoon between 12 and 4 with Causal riders renting the most. We do see that Registered riders rent bikes around 1 am more than Casual riders. 
+
+
   14. Change the graph from the previous problem to facet on `client` and fill with `weekday`. What information does this graph tell you that the previous didn't? Is one graph better than the other?
   
 ```{r}
@@ -285,10 +291,12 @@ Trips %>%
          weekend = ifelse(DoW == c("Sat", "Sun"), 'weekend', 'weekday')) %>% 
   ggplot(aes(x = time_dec)) +
   geom_density(aes(fill = weekend), color = NA, alpha = 0.5) +
-  labs(title = "Number of Bike Rental Events per Time of Day", x = "", y ="") +
-  facet_wrap(~ client)
+  labs(title = "Number of Bike Rental Events per Time of Day", x = "", y ="", fill = "Weekend") +
+  facet_wrap(~ client) +
+  theme(axis.text.y = element_blank())
 ```
-  
+Interpret: The trends differ between weekdays and weekends more for Registered riders than Casual riders. It also appears that Casual riders use bikes slightly more on weekends than weekdays with a sharper peak around 3pm. We can also see how Registered riders change their habits between weekdays and weekends when they like to rent their bikes.  
+
 ### Spatial patterns
 
   15. Use the latitude and longitude variables in `Stations` to make a visualization of the total number of departures from each station in the `Trips` data. Use either color or size to show the variation in number of departures. We will improve this plot next week when we learn about maps!
@@ -300,10 +308,12 @@ Trips %>%
   left_join(Stations, by = c("sstation" = "name")) %>% 
   ggplot(aes(x = long, y = lat)) +
   geom_point(aes(col = n), alpha = 0.75) +
-  scale_color_continuous(low = "pink", high = "maroon") +
-  labs(title = "Number of Bike Departures in Space", col = "Departures", x = "Longitude", y = "Latitude")
+  scale_color_continuous(low = "pink", high = "maroon4") +
+  labs(title = "Total Number of Bike Departures in Space", col = "Departures", x = "Longitude", y = "Latitude")
 ```
-  
+
+Interpret: The highest number of rentals appear to occur in the city or in the most concentrated part of the rental space. All the points are clustered together and it appears that people mostly use the service to get around the within the cities.
+
   16. Only 14.4% of the trips in our data are carried out by casual users. Create a plot that shows which area(s) have stations with a much higher percentage of departures by casual users. What patterns do you notice? (Again, we'll improve this next week when we learn about maps).
   
 ```{r}
@@ -313,9 +323,12 @@ Trips %>%
   left_join(Stations, by = c("sstation" = "name")) %>% 
   ggplot(aes(x = long, y = lat)) +
   geom_point(aes(col = prop_casual), alpha = 0.75) +
-  scale_color_continuous(low = "pink", high = "maroon") +
+  scale_color_continuous(low = "pink", high = "maroon4") +
   labs(title = "Proportion of Bike Departures by Clients in Space", col = "Departures", x = "Longitude", y = "Latitude")
 ```
+  
+Interpret: The largest proportion of Casual riders appear to com from outside of the cities or appear to leave the cities and come back. This helps me to conclude that casual riders go between the city and suburbs occasionally whhile the registered riders rely on the bike service to commute around the city more consistently.  
+  
   
 **DID YOU REMEMBER TO GO BACK AND CHANGE THIS SET OF EXERCISES TO THE LARGER DATASET? IF NOT, DO THAT NOW.**
 
@@ -340,14 +353,24 @@ breed_traits_total <-
   
  breed_traits_total %>% 
    ggplot(aes(x = total_rating, y = fct_reorder(Breed,total_rating))) +
-   geom_bar(stat = 'identity') +
-  labs
+   geom_bar(stat = 'identity', fill = "darkred") +
+  labs(title = "Total Rating by Dog Breed", x = "", y ="")
 ```
 
-  18. The final product of this exercise will be a graph with the top-20 dogs in total ratings (from previous problem) on the y-axis, year on the x-axis, and points colored by each breed's ranking for that year (from the `breed_rank_all` dataset). The points within each breed will be connected by a line, and the breeds should be arranged from the highest median rank to lowest median rank ("highest" is actually the smallest numer, eg. 1 = best). After you're finished, think of AT LEAST one thing you could you do to make this graph better. HINTS: 1. Start with the `breed_rank_all` dataset and pivot it so year is a variable. 2. Use the `separate()` function to get year alone, and there's an extra argument in that function that can make it numeric. 3. For both datasets used, you'll need to `str_squish()` Breed before joining. 
+  18. The final product of this exercise will be a graph with the top-20 dogs in total ratings (from previous problem) on the y-axis, year on the x-axis, and points colored by each breed's ranking for that year (from the `breed_rank_all` dataset). The points within each breed will be connected by a line, and the breeds should be arranged from the highest median rank to lowest median rank ("highest" is actually the smallest number, eg. 1 = best). After you're finished, think of AT LEAST one thing you could you do to make this graph better. HINTS: 1. Start with the `breed_rank_all` dataset and pivot it so year is a variable. 2. Use the `separate()` function to get year alone, and there's an extra argument in that function that can make it numeric. 3. For both datasets used, you'll need to `str_squish()` Breed before joining. 
   
 ```{r}
 
+breed_rank_all %>%
+  pivot_longer(cols = starts_with("20"),
+              names_to = "Year",
+              values_to = "Rank" ) %>% 
+  separate(Year, 
+           into = "Year",
+           extra = 'drop',
+           convert = TRUE) %>% 
+  left_join()
+           
 ```
   
   19. Create your own! Requirements: use a `join` or `pivot` function (or both, if you'd like), a `str_XXX()` function, and a `fct_XXX()` function to create a graph using any of the dog datasets. One suggestion is to try to improve the graph you created for the Tidy Tuesday assignment. If you want an extra challenge, find a way to use the dog images in the `breed_rank_all` file - check out the `ggimage` library and [this resource](https://wilkelab.org/ggtext/) for putting images as labels.
