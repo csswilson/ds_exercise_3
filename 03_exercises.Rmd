@@ -12,7 +12,7 @@ output:
 
 
 ```{r setup, include=FALSE}
-#knitr::opts_chunk$set(echo = TRUE, error=TRUE, message=FALSE, warning=FALSE)
+knitr::opts_chunk$set(echo = TRUE, error=TRUE, message=FALSE, warning=FALSE)
 ```
 
 ```{r libraries}
@@ -349,7 +349,7 @@ breed_traits_total <-
 ```
 
 
-```{r, fig.height=10, fig.width=4}
+```{r, fig.height=25, fig.width=5}
   
  breed_traits_total %>% 
    ggplot(aes(x = total_rating, y = fct_reorder(Breed,total_rating))) +
@@ -412,7 +412,8 @@ Here we see that out of the 5 dogs that got a 5 score on 'Drooling Level', Newfo
 
   20. Below, provide a link to your GitHub page with this set of Weekly Exercises. Specifically, if the name of the file is 03_exercises.Rmd, provide a link to the 03_exercises.md file, which is the one that will be most readable on GitHub.
   
-[03_exercises.Rmd Git Link](https://github.com/csswilson/ds_exercise_3.git)
+[Repository](https://github.com/csswilson/ds_exercise_3.git)  
+[03_exercises.Rmd Git Link](https://github.com/csswilson/ds_exercise_3/blob/506723c9685447c752ffb9a1301a117d67d00593/03_exercises.Rmd)
 
 ## Challenge problem! 
 
