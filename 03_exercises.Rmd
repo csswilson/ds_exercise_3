@@ -361,27 +361,58 @@ breed_traits_total <-
   
 ```{r}
 
-breed_rank_all %>%
-  pivot_longer(cols = starts_with("20"),
+special_breeds <- breed_rank_all %>%
+  pivot_longer(cols = `2013 Rank`:`2020 Rank`,
               names_to = "Year",
               values_to = "Rank" ) %>% 
   separate(Year, 
            into = "Year",
            extra = 'drop',
            convert = TRUE) %>% 
-  left_join()
-           
-```
+  inner_join(breed_traits_total %>% mutate(Breed = str_squish(Breed)) %>% arrange(total_rating) %>% top_n(20), 
+            by = 'Breed')
   
+breed_traits_total %>% mutate(Breed = str_squish(Breed)) %>% arrange(total_rating) %>% top_n(20)
+                                                                      
+special_breeds %>% 
+ ggplot(aes(y = fct_reorder(Breed, total_rating), x = Year, color = Rank)) +
+  geom_point() +
+  geom_line(aes(group =Breed)) +
+  labs(title = 'Top 20 Dog Breeds Ranked Across Time', x = "", y ="" ) +
+  scale_color_continuous(low = "maroon4", high = "white")
+```
+
+The lines connecting each point do not mean much. I would do the top 10 and have color be Breed, and put rank on the y to see how rank varied over time x for each breed. 
+
   19. Create your own! Requirements: use a `join` or `pivot` function (or both, if you'd like), a `str_XXX()` function, and a `fct_XXX()` function to create a graph using any of the dog datasets. One suggestion is to try to improve the graph you created for the Tidy Tuesday assignment. If you want an extra challenge, find a way to use the dog images in the `breed_rank_all` file - check out the `ggimage` library and [this resource](https://wilkelab.org/ggtext/) for putting images as labels.
   
 ```{r}
-
+breed_rank_all %>%
+  pivot_longer(cols = `2013 Rank`:`2020 Rank`,
+              names_to = "Year",
+              values_to = "Rank" ) %>% 
+  separate(Year, 
+           into = "Year",
+           extra = 'drop',
+           convert = TRUE) %>% 
+  inner_join(breed_traits %>% 
+               filter(`Drooling Level` == '5') %>% 
+               mutate(Breed = str_squish(Breed)),
+                       by = 'Breed') %>% 
+  ggplot(aes(color = fct_rev(fct_reorder(Breed, Rank)), x = Year, y = Rank))+
+  geom_point() +
+  geom_line(aes(group = Breed)) +
+  labs(title = "Ranks Across Time of Dog Breeds that Drool the Most", x = "", y ="", color = 'Breed')
+  
 ```
   
+Here we see that out of the 5 dogs that got a 5 score on 'Drooling Level', Newfoundlands are the most highly ranked and are the best while Neapolitan Mastiffs are the lowest ranked. 
+
 ## GitHub link
 
   20. Below, provide a link to your GitHub page with this set of Weekly Exercises. Specifically, if the name of the file is 03_exercises.Rmd, provide a link to the 03_exercises.md file, which is the one that will be most readable on GitHub.
+  
+[03_exercises.Rmd Git Link](https://github.com/csswilson/ds_exercise_3.git)
 
 ## Challenge problem! 
 
